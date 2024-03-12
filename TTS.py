@@ -54,6 +54,7 @@ async def TTS(bot,message):
     communicate = edge_tts.Communicate(message.text, voice)
     await communicate.save('voice.mp3') 
     await bot.send_voice(message.chat.id,"voice.mp3",caption=f'{voice}') 
+    user.wordsleft = user.wordsleft - len(message.text.split())
 
 
 # Triggers
@@ -67,12 +68,11 @@ def Greetuser(bot,message):
          try:
               name = message.from_user.first_name
          except:
-              name = 'User'+ str(id)
-    
+              name = 'User'+ str(id)    
     if id in botusers:        
         user = User.get_user(botusers.get(id))         
         match = re.findall(r'-(\w+)Neural', user.selectedvoice)
-        message.reply(f"Dear {user.username} Welcome \n Is premium : {user.premium_status} \n selected voice : {match[0]}")
+        message.reply(f"Dear {user.username} Welcome \n words left : {user.wordsleft} \n selected voice : {match[0]}")
     else :
         message.reply("Welcome")
         botusers[id] = User(id,name)
@@ -104,8 +104,12 @@ def setmekdes(bot,message):
 
 @bot.on_message(filters.private & filters.text)
 async def TextToSpeech(bot,message):
-    
-    await TTS(bot,message)
+    user = User.get_user(botusers.get(message.from_user.id))
+    if user.wordsleft > len(message.text.split()): 
+        await TTS(bot,message)
+    else :
+        await message.reply("I'm sorry you don't have enough words left for today , Try again tomorrow")
+
 
 
 
