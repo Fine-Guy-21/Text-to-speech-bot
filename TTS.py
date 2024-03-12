@@ -40,6 +40,8 @@ Language_menu = [
                     ['Amharic','More languages']             
                 ]
 Amh_lang_menu = [ ['Ameha','Mekdes'] ]
+Rus_lang_menu = [ ['Dmitry','Svetlana'] ]
+Fre_lang_menu = [ ['Henri','Denise'] ]
 
 
 
@@ -84,23 +86,72 @@ def ChangeLanguage(bot,message):
     Lang_Menu = ReplyKeyboardMarkup(Language_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Language")
     message.reply(text=text, reply_markup = Lang_Menu )
 
+# amharic
+
 @bot.on_message(filters.private & filters.regex('Amharic'))
 def AmharicMenu(bot,message):
     text = "Ok Now, select your prefered voice"
-    Amh_Menu =ReplyKeyboardMarkup(Amh_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Amh_Menu )
+    Lang_Menu =ReplyKeyboardMarkup(Amh_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
 
 @bot.on_message(filters.private & filters.regex('Ameha'))
-def setameha(bot,message):
+def setAmeha(bot,message):
     user = User.get_user(botusers.get(message.from_user.id))         
     user.ChangeVoice("am-ET-AmehaNeural")
     message.reply("Language Succesfully changed")
     
 @bot.on_message(filters.private & filters.regex('Mekdes'))
-def setmekdes(bot,message):    
+def setMekdes(bot,message):    
     user = User.get_user(botusers.get(message.from_user.id))         
     user.ChangeVoice("am-ET-MekdesNeural")
     message.reply("Language Succesfully changed")
+
+# russian
+
+@bot.on_message(filters.private & filters.regex("Russian"))
+def RussianMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(Rus_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Dmitry'))
+def setDmitry(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("ru-RU-DmitryNeural")
+    message.reply("Language Succesfully changed")
+
+@bot.on_message(filters.private & filters.regex('Svetlana'))
+def setSvetlana(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("ru-RU-SvetlanaNeural")
+    message.reply("Language Succesfully changed")
+
+# french 
+    
+@bot.on_message(filters.private & filters.regex('French'))
+def FrenchMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(Fre_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Henri'))
+def setHenri(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("fr-FR-HenriNeural")
+    message.reply("Language Succesfully changed")    
+
+@bot.on_message(filters.private & filters.regex('Denise'))
+def setDenise(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("fr-FR-DeniseNeural")
+    message.reply("Language Succesfully changed")
+
+
+
+@bot.on_message(filters.private & filters.regex('More languages'))
+def MoreLang(bot,message):
+    message.reply("Coming Soon . . .")
+
 
 @bot.on_message(filters.private & filters.text)
 async def TextToSpeech(bot,message):
@@ -112,12 +163,6 @@ async def TextToSpeech(bot,message):
 
 
 
-
-
-#     if message.reply_to_message:
-#         text = message.reply_to_message.text
-#     else:
-#         text = message.text[5:]
 
        
 
