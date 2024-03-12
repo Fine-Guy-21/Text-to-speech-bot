@@ -42,6 +42,10 @@ Language_menu = [
 Amh_lang_menu = [ ['Ameha','Mekdes'] ]
 Rus_lang_menu = [ ['Dmitry','Svetlana'] ]
 Fre_lang_menu = [ ['Henri','Denise'] ]
+Spa_lang_menu = [ ['Alvaro','Elvira'] ]
+Eng_lang_menu = [ ['Steffan','Jenny'] ]
+man_lang_menu = [ ['Yunjian','Xiaoxiao'] ]
+Ara_lang_menu = [ ['Hamdan','Fatima'] ]
 
 
 
@@ -85,6 +89,15 @@ def ChangeLanguage(bot,message):
     text = "Select your prefered language."
     Lang_Menu = ReplyKeyboardMarkup(Language_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Language")
     message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.command("stat"))
+def Greetuser(bot,message):    
+    id = message.from_user.id
+    if id in botusers:        
+        user = User.get_user(botusers.get(id))         
+        match = re.findall(r'-(\w+)Neural', user.selectedvoice)
+        message.reply(f""" User : {user.username}\n words left : {user.wordsleft} \n selected voice : {match[0]} \n premium : {user.premium_status}""")
+
 
 # amharic
 
@@ -145,6 +158,86 @@ def setDenise(bot,message):
     user = User.get_user(botusers.get(message.from_user.id))         
     user.ChangeVoice("fr-FR-DeniseNeural")
     message.reply("Language Succesfully changed")
+
+# spanish
+    
+@bot.on_message(filters.private & filters.regex('Spanish'))
+def SpanishMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(Spa_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Alvaro'))
+def setAlvaro(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("es-ES-AlvaroNeural")
+    message.reply("Language Succesfully changed")    
+
+@bot.on_message(filters.private & filters.regex('Elvira'))
+def setElvira(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("es-ES-ElviraNeural")
+    message.reply("Language Succesfully changed")
+
+# english
+    
+@bot.on_message(filters.private & filters.regex('English'))
+def EnglishMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(Eng_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Steffan'))
+def setSteffan(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("en-US-SteffanNeural")
+    message.reply("Language Succesfully changed")    
+
+@bot.on_message(filters.private & filters.regex('Jenny'))
+def setJenny(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("en-US-JennyNeural")
+    message.reply("Language Succesfully changed")    
+
+# mandarin
+    
+@bot.on_message(filters.private & filters.regex('Mandarin'))
+def MandarinMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(man_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Yunjian'))
+def setYunjian(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("zh-CN-YunjianNeural")
+    message.reply("Language Succesfully changed")    
+
+@bot.on_message(filters.private & filters.regex('Xiaoxiao'))
+def setXiaoxiao(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("zh-CN-XiaoxiaoNeural")
+    message.reply("Language Succesfully changed")    
+
+# arabic
+
+@bot.on_message(filters.private & filters.regex('Arabic'))
+def ArabicMenu(bot,message):
+    text = "Ok Now, select your prefered voice"
+    Lang_Menu =ReplyKeyboardMarkup(Ara_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+    message.reply(text=text, reply_markup = Lang_Menu )
+
+@bot.on_message(filters.private & filters.regex('Hamdan'))
+def setHamdan(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("ar-Ae-HamdanNeural")
+    message.reply("Language Succesfully changed")    
+
+@bot.on_message(filters.private & filters.regex('Fatima'))
+def setFatima(bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))         
+    user.ChangeVoice("ar-Ae-FatimaNeural")
+    message.reply("Language Succesfully changed")    
 
 
 
