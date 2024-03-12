@@ -102,148 +102,213 @@ def Greetuser(bot,message):
 # amharic
 
 @bot.on_message(filters.private & filters.regex('Amharic'))
-def AmharicMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Amh_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def AmharicMenu(bot,message):
+    if message.text == 'Amharic':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Amh_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message) 
 
 @bot.on_message(filters.private & filters.regex('Ameha'))
-def setAmeha(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("am-ET-AmehaNeural")
-    message.reply("Language Succesfully changed")
-    
+async def setAmeha(bot,message):
+    if message.text == 'Ameha':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("am-ET-AmehaNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
+
 @bot.on_message(filters.private & filters.regex('Mekdes'))
-def setMekdes(bot,message):    
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("am-ET-MekdesNeural")
-    message.reply("Language Succesfully changed")
+async def setMekdes(bot,message):    
+    if message.text == 'Mekdes':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("am-ET-MekdesNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
 
 # russian
 
 @bot.on_message(filters.private & filters.regex("Russian"))
-def RussianMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Rus_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def RussianMenu(bot,message):
+    if message.text == 'Russian':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Rus_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Dmitry'))
-def setDmitry(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("ru-RU-DmitryNeural")
-    message.reply("Language Succesfully changed")
+async def setDmitry(bot,message):
+    if message.text == 'Dmitry':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("ru-RU-DmitryNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Svetlana'))
-def setSvetlana(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("ru-RU-SvetlanaNeural")
-    message.reply("Language Succesfully changed")
+async def setSvetlana(bot,message):
+    if message.text == 'Svetlana':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("ru-RU-SvetlanaNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
 
 # french 
     
 @bot.on_message(filters.private & filters.regex('French'))
-def FrenchMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Fre_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def FrenchMenu(bot,message):
+    if message.text == 'French':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Fre_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Henri'))
-def setHenri(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("fr-FR-HenriNeural")
-    message.reply("Language Succesfully changed")    
+async def setHenri(bot,message):
+    if message.text == 'Henri':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("fr-FR-HenriNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Denise'))
-def setDenise(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("fr-FR-DeniseNeural")
-    message.reply("Language Succesfully changed")
+async def setDenise(bot,message):
+    if message.text == 'Denise':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("fr-FR-DeniseNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
 
 # spanish
     
 @bot.on_message(filters.private & filters.regex('Spanish'))
-def SpanishMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Spa_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def SpanishMenu(bot,message):
+    if message.text == 'Spanish':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Spa_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Alvaro'))
-def setAlvaro(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("es-ES-AlvaroNeural")
-    message.reply("Language Succesfully changed")    
+async def setAlvaro(bot,message):
+    if message.text == 'Alvaro':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("es-ES-AlvaroNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Elvira'))
-def setElvira(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("es-ES-ElviraNeural")
-    message.reply("Language Succesfully changed")
+async def setElvira(bot,message):
+    if message.text == 'Elvira':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("es-ES-ElviraNeural")
+        await message.reply("Language Succesfully changed")
+    else:
+        await TTS(bot,message)
 
 # english
     
 @bot.on_message(filters.private & filters.regex('English'))
-def EnglishMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Eng_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def EnglishMenu(bot,message):
+    if message.text == 'English':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Eng_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Steffan'))
-def setSteffan(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("en-US-SteffanNeural")
-    message.reply("Language Succesfully changed")    
+async def setSteffan(bot,message):
+    if message.text == 'Steffan':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("en-US-SteffanNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Jenny'))
-def setJenny(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("en-US-JennyNeural")
-    message.reply("Language Succesfully changed")    
+async def setJenny(bot,message):
+    if message.text == 'Jenny':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("en-US-JennyNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 # mandarin
     
 @bot.on_message(filters.private & filters.regex('Mandarin'))
-def MandarinMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(man_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
-
+async def MandarinMenu(bot,message):
+    if message.text == 'Mandarin':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(man_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
+    
 @bot.on_message(filters.private & filters.regex('Yunjian'))
-def setYunjian(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("zh-CN-YunjianNeural")
-    message.reply("Language Succesfully changed")    
-
+async def setYunjian(bot,message):
+    if message.text == 'Yunjian':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("zh-CN-YunjianNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 @bot.on_message(filters.private & filters.regex('Xiaoxiao'))
-def setXiaoxiao(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("zh-CN-XiaoxiaoNeural")
-    message.reply("Language Succesfully changed")    
-
+async def setXiaoxiao(bot,message):
+    if message.text == 'Xiaoxiao':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("zh-CN-XiaoxiaoNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
+    
 # arabic
 
 @bot.on_message(filters.private & filters.regex('Arabic'))
-def ArabicMenu(bot,message):
-    text = "Ok Now, select your prefered voice"
-    Lang_Menu =ReplyKeyboardMarkup(Ara_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
-    message.reply(text=text, reply_markup = Lang_Menu )
+async def ArabicMenu(bot,message):
+    if message.text == 'Arabic':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Ara_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Hamdan'))
-def setHamdan(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("ar-Ae-HamdanNeural")
-    message.reply("Language Succesfully changed")    
+async def setHamdan(bot,message):
+    if message.text == 'Hamdan':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("ar-Ae-HamdanNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 @bot.on_message(filters.private & filters.regex('Fatima'))
-def setFatima(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))         
-    user.ChangeVoice("ar-Ae-FatimaNeural")
-    message.reply("Language Succesfully changed")    
+async def setFatima(bot,message):
+    if message.text == 'Fatima':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("ar-Ae-FatimaNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
-
+# more language
 
 @bot.on_message(filters.private & filters.regex('More languages'))
-def MoreLang(bot,message):
-    message.reply("Coming Soon . . .")
+async def MoreLang(bot,message):
+    if message.text == 'More languages':
+        await message.reply("Coming Soon . . .")
+    else:
+        await TTS(bot,message)
 
 
 @bot.on_message(filters.private & filters.text)
