@@ -1,7 +1,7 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters , enums
 from pyrogram.types import ReplyKeyboardMarkup 
 from edge_tts import VoicesManager
-import time, re , edge_tts
+import time , re , edge_tts
 
 
 bot = Client("TTS Bot",api_id=21832338, 
@@ -37,15 +37,17 @@ class User:
 Language_menu = [   
                     ['English','Spanish','French'],
                     ['Mandarin', 'Russian', 'Arabic'],
-                    ['Amharic','More languages']             
+                    ['German','Amharic','More languages']             
                 ]
-Amh_lang_menu = [ ['Ameha','Mekdes'] ]
-Rus_lang_menu = [ ['Dmitry','Svetlana'] ]
-Fre_lang_menu = [ ['Henri','Denise'] ]
-Spa_lang_menu = [ ['Alvaro','Elvira'] ]
-Eng_lang_menu = [ ['Steffan','Jenny'] ]
-man_lang_menu = [ ['Yunjian','Xiaoxiao'] ]
-Ara_lang_menu = [ ['Hamdan','Fatima'] ]
+
+Amh_lang_menu = [ ['Ameha','Mekdes'], ['Back'] ]
+Rus_lang_menu = [ ['Dmitry','Svetlana'], ['Back'] ]
+Fre_lang_menu = [ ['Henri','Denise'], ['Back'] ]
+Spa_lang_menu = [ ['Alvaro','Elvira'], ['Back'] ]
+Eng_lang_menu = [ ['Steffan','Jenny'], ['Back'] ]
+man_lang_menu = [ ['Yunjian','Xiaoxiao'], ['Back'] ]
+Ara_lang_menu = [ ['Hamdan','Fatima'], ['Back'] ]
+Ger_lang_menu = [ ['Conrad','Amala'], ['Back']]
 
 
 
@@ -53,14 +55,28 @@ Ara_lang_menu = [ ['Hamdan','Fatima'] ]
 # Functions 
 
 async def TTS(bot,message):
-    await message.reply("processing")
+    await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
+    time.sleep(2)
+    mes = await message.reply("Reading Text . . .")
     voices = await VoicesManager.create()
     user = User.get_user(botusers.get(message.from_user.id))
+    time.sleep(3)    
+    await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
     voice= user.selectedvoice
-    communicate = edge_tts.Communicate(message.text, voice)
-    await communicate.save('voice.mp3') 
-    await bot.send_voice(message.chat.id,"voice.mp3",caption=f'{voice}') 
-    user.wordsleft = user.wordsleft - len(message.text.split())
+    try:
+        await bot.send_chat_action(message.chat.id,enums.ChatAction.RECORD_AUDIO)    
+        communicate = edge_tts.Communicate(message.text, voice)
+        await communicate.save('voice.mp3') 
+        await bot.send_chat_action(message.chat.id,enums.ChatAction.UPLOAD_AUDIO)        
+        match = re.findall(r'-(\w+)Neural', user.selectedvoice)
+        await bot.delete_messages(message.chat.id,mes.id)
+        await bot.send_voice(message.chat.id,"voice.mp3",caption=f"{match[0]}'s voice") 
+        if user.premium_status == False:
+            user.wordsleft = user.wordsleft - len(message.text.split())
+    except:
+        await bot.delete_messages(message.chat.id,mes.id)
+        await message.reply("There is an error in the input please try again")
+        
 
 
 # Triggers
@@ -90,6 +106,11 @@ def ChangeLanguage(bot,message):
     Lang_Menu = ReplyKeyboardMarkup(Language_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Language")
     message.reply(text=text, reply_markup = Lang_Menu )
 
+@bot.on_message(filters.private & filters.regex('Back'))
+def GoBackMenu(bot,message):
+    Lang_Menu = ReplyKeyboardMarkup(Language_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Language")
+    message.reply(text=" Select language ", reply_markup = Lang_Menu )
+
 @bot.on_message(filters.private & filters.command("stat"))
 def Greetuser(bot,message):    
     id = message.from_user.id
@@ -98,7 +119,14 @@ def Greetuser(bot,message):
         match = re.findall(r'-(\w+)Neural', user.selectedvoice)
         message.reply(f""" User : {user.username}\n words left : {user.wordsleft} \n selected voice : {match[0]} \n premium : {user.premium_status}""")
 
-
+@bot.on_message(filters.private & filters.regex('chgprem'))
+def PromoteDemote (bot,message):
+    user = User.get_user(botusers.get(message.from_user.id))
+    if user.premium_status == False:
+        user.ChangePremium(True)
+    else:
+        user.ChangePremium(False)
+                    
 # amharic
 
 @bot.on_message(filters.private & filters.regex('Amharic'))
@@ -263,6 +291,7 @@ async def setYunjian(bot,message):
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
+
 @bot.on_message(filters.private & filters.regex('Xiaoxiao'))
 async def setXiaoxiao(bot,message):
     if message.text == 'Xiaoxiao':
@@ -301,16 +330,43 @@ async def setFatima(bot,message):
     else:
         await TTS(bot,message)
 
-# more language
+# german
 
-@bot.on_message(filters.private & filters.regex('More languages'))
-async def MoreLang(bot,message):
-    if message.text == 'More languages':
-        await message.reply("Coming Soon . . .")
+@bot.on_message(filters.private & filters.regex('German'))
+async def GermanMenu(bot,message):
+    if message.text == 'German':
+        text = "Ok Now, select your prefered voice"
+        Lang_Menu =ReplyKeyboardMarkup(Ger_lang_menu,one_time_keyboard=True, resize_keyboard=True,placeholder="Choose Voice")
+        await message.reply(text=text, reply_markup = Lang_Menu )
+    else:
+        await TTS(bot,message)
+
+@bot.on_message(filters.private & filters.regex('Conrad'))
+async def setConrad(bot,message):
+    if message.text == 'Conrad':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("de-DE-ConradNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
+
+@bot.on_message(filters.private & filters.regex('Amala'))
+async def setAmala(bot,message):
+    if message.text == 'Amala':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("de-DE-AmalaNeural")
+        await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
 
 
+# more language
+
+
+
+
+# the text
+        
 @bot.on_message(filters.private & filters.text)
 async def TextToSpeech(bot,message):
     user = User.get_user(botusers.get(message.from_user.id))
