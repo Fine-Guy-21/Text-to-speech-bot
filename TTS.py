@@ -48,7 +48,7 @@ Eng_lang_menu = [ ['Steffan','Jenny'], ['Back'] ]
 man_lang_menu = [ ['Yunjian','Xiaoxiao'], ['Back'] ]
 Ara_lang_menu = [ ['Hamdan','Fatima'], ['Back'] ]
 Ger_lang_menu = [ ['Conrad','Amala'], ['Back']]
-
+ml_lang_menu = [ ['Ana(Eng Child)','Neerja(Eng Indian)'], ['Back'] ]
 
 
 
@@ -362,7 +362,31 @@ async def setAmala(bot,message):
 
 # more language
 
+@bot.on_message(filters.private & filters.regex('More languages'))
+async def MoreLang(bot,message):
+    if message.text == 'More languages':
+        ml_Menu = ReplyKeyboardMarkup(ml_lang_menu,one_time_keyboard=True,resize_keyboard=True,placeholder="Explore other languages")
+        await message.reply(text= "More languages Coming Soon . . .", reply_markup = ml_Menu)
+    else:
+        await TTS(bot,message)
 
+@bot.on_message(filters.private & filters.regex('Ana'))
+async def setAna(bot,message):
+    if message.text == 'Ana(Eng Child)':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("en-US-AnaNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
+
+@bot.on_message(filters.private & filters.regex('Neerja'))
+async def setNeerja(bot,message):
+    if message.text == 'Neerja(Eng Indian)':
+        user = User.get_user(botusers.get(message.from_user.id))         
+        user.ChangeVoice("en-IN-NeerjaNeural")
+        await message.reply("Language Succesfully changed")    
+    else:
+        await TTS(bot,message)
 
 
 # the text
