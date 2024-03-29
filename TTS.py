@@ -1,7 +1,7 @@
 from pyrogram import Client, filters , enums
 from pyrogram.types import ReplyKeyboardMarkup 
 from edge_tts import VoicesManager
-import time , re , edge_tts
+import time , re , edge_tts , mysql.connector
 
 
 bot = Client("TTS Bot",api_id=21832338, 
@@ -10,6 +10,16 @@ bot = Client("TTS Bot",api_id=21832338,
 
 
 botusers = {}
+
+Conn = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    port='3307',
+    password='cityzens',
+    database='TTSBotDB'
+)
+print(Conn)
+Cur = Conn.cursor()
 
 class User:
     Inst = []
@@ -54,51 +64,112 @@ ml_lang_menu = [ ['Ana(Eng Child)','Neerja(Eng Indian)'], ['Back'] ]
 
 # Functions 
 
+# async def TTS(bot,message):
+#     await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
+#     time.sleep(2)
+#     mes = await message.reply("Reading Text . . .")
+#     voices = await VoicesManager.create()
+#     user = User.get_user(botusers.get(message.from_user.id))
+#     time.sleep(3)    
+#     await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
+#     voice= user.selectedvoice
+#     try:
+#         await bot.send_chat_action(message.chat.id,enums.ChatAction.RECORD_AUDIO)    
+#         communicate = edge_tts.Communicate(message.text, voice)
+#         await communicate.save('voice.mp3') 
+#         await bot.send_chat_action(message.chat.id,enums.ChatAction.UPLOAD_AUDIO)        
+#         match = re.findall(r'-(\w+)Neural', user.selectedvoice)
+#         await bot.delete_messages(message.chat.id,mes.id)
+#         await bot.send_voice(message.chat.id,"voice.mp3",caption=f"{match[0]}'s voice") 
+#         if user.premium_status == False:
+#             user.wordsleft = user.wordsleft - len(message.text.split())
+#     except:
+#         await bot.delete_messages(message.chat.id,mes.id)
+#         await message.reply("There is an error in the input please try again")
+
 async def TTS(bot,message):
     await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     time.sleep(2)
     mes = await message.reply("Reading Text . . .")
     voices = await VoicesManager.create()
-    user = User.get_user(botusers.get(message.from_user.id))
-    time.sleep(3)    
-    await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
-    voice= user.selectedvoice
+    # user = User.get_user(botusers.get(message.from_user.id))    
+    user = Get_User(message.from_user.id)
+    # time.sleep(3)    
+    if user :
+        await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
+        voice= user[4]
+        try:
+            await bot.send_chat_action(message.chat.id,enums.ChatAction.RECORD_AUDIO)    
+            communicate = edge_tts.Communicate(message.text, voice)
+            await communicate.save('voice.mp3') 
+            await bot.send_chat_action(message.chat.id,enums.ChatAction.UPLOAD_AUDIO)        
+            match = re.findall(r'-(\w+)Neural', user[4])
+            await bot.delete_messages(message.chat.id,mes.id)
+            await bot.send_voice(message.chat.id,"voice.mp3",caption=f"{match[0]}'s voice") 
+            if user[3] == 0:
+                wl = int(user[2]) - len(message.text.split())
+                Cur.execute(f"update User set wordsleft = {wl} where id= {user[0]};")
+                Conn.commit()
+        except:
+            await bot.delete_messages(message.chat.id,mes.id)
+            await message.reply("There is an error in the input please try again")
+
+def Get_User(id):
+    Cur.execute(f'select * from User where id={id}')
+    result = Cur.fetchall()
+    if result:
+        for res in result:
+            time.sleep(1)
+        return res
+    else:
+        return None
+
+
+def Manage_User(Chat_id,id):
+    print("temp")
+    TgUser = bot.get_users(id)
+
     try:
-        await bot.send_chat_action(message.chat.id,enums.ChatAction.RECORD_AUDIO)    
-        communicate = edge_tts.Communicate(message.text, voice)
-        await communicate.save('voice.mp3') 
-        await bot.send_chat_action(message.chat.id,enums.ChatAction.UPLOAD_AUDIO)        
-        match = re.findall(r'-(\w+)Neural', user.selectedvoice)
-        await bot.delete_messages(message.chat.id,mes.id)
-        await bot.send_voice(message.chat.id,"voice.mp3",caption=f"{match[0]}'s voice") 
-        if user.premium_status == False:
-            user.wordsleft = user.wordsleft - len(message.text.split())
-    except:
-        await bot.delete_messages(message.chat.id,mes.id)
-        await message.reply("There is an error in the input please try again")
-        
-
-
-# Triggers
-
-@bot.on_message(filters.private & (filters.command("start") or filters.command("Start")))
-def Greetuser(bot,message):    
-    id = message.from_user.id
-    try:
-         name = message.from_user.first_name + ' ' +message.from_user.last_name
+         name = TgUser.first_name + ' ' +TgUser.last_name
     except:
          try:
-              name = message.from_user.first_name
+              name = TgUser.first_name
          except:
               name = 'User'+ str(id)    
     if id in botusers:        
         user = User.get_user(botusers.get(id))         
         match = re.findall(r'-(\w+)Neural', user.selectedvoice)
-        message.reply(f"Dear {user.username} Welcome \n words left : {user.wordsleft} \n selected voice : {match[0]}")
+        bot.send_message(Chat_id ,f"Dear {user.username} Welcome \n words left : {user.wordsleft} \n selected voice : {match[0]}")
     else :
-        message.reply("Welcome")
+        bot.send_message(Chat_id,"Welcome")
         botusers[id] = User(id,name)
-        print(botusers)
+        print(botusers)        
+
+def MU (bot,message):
+    Cur.execute(f'select * from User where id={message.from_user.id}')
+    result = Cur.fetchall()
+    if result:
+        for res in result:
+            print(res)
+            message.reply(f"Finally Welcome again `{res[1]}`")
+    else :
+        uid = message.from_user.id
+        name = f"User{uid}"
+        sv = 'en-US-SteffanNeural'
+        msg = f"Insert into User(id, username,wordsleft,premium_status,selected_voice) values({uid},'{name}',300,False,'{sv}');"
+        Cur.execute(msg)
+        Conn.commit() 
+        message.reply(f"Welcome Dear {name}")
+    
+
+    
+
+# Triggers
+
+@bot.on_message(filters.private & (filters.command("start") or filters.command("Start")))
+def Greetuser(bot,message):    
+    # Manage_User(message.chat.id,  message.from_user.id)
+    MU(bot,message)
 
 @bot.on_message(filters.private & (filters.command("lang") | filters.command("language")))
 def ChangeLanguage(bot,message):
@@ -359,7 +430,6 @@ async def setAmala(bot,message):
     else:
         await TTS(bot,message)
 
-
 # more language
 
 @bot.on_message(filters.private & filters.regex('More languages'))
@@ -394,7 +464,8 @@ async def setNeerja(bot,message):
 @bot.on_message(filters.private & filters.text)
 async def TextToSpeech(bot,message):
     user = User.get_user(botusers.get(message.from_user.id))
-    if user.wordsleft > len(message.text.split()): 
+    user = Get_User(message.from_user.id)
+    if user[2] > len(message.text.split()): 
         await TTS(bot,message)
     else :
         await message.reply("I'm sorry you don't have enough words left for today , Try again tomorrow")
