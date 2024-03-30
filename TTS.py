@@ -31,9 +31,6 @@ class User:
         self.selectedvoice = "en-US-SteffanNeural"
         User.Inst.append(self)
 
-    def ChangeVoice(self,voice):
-        self.selectedvoice = voice
-
     def is_premium(self):
         return self.premium_status
 
@@ -42,6 +39,7 @@ class User:
 
     def get_user(obj):
         return obj
+
 
 
 Language_menu = [   
@@ -69,7 +67,7 @@ ml_lang_menu = [ ['Ana(Eng Child)','Neerja(Eng Indian)'], ['Back'] ]
 #     time.sleep(2)
 #     mes = await message.reply("Reading Text . . .")
 #     voices = await VoicesManager.create()
-#     user = User.get_user(botusers.get(message.from_user.id))
+#     user = Get_User(message.from_user.id)
 #     time.sleep(3)    
 #     await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
 #     voice= user.selectedvoice
@@ -91,10 +89,9 @@ async def TTS(bot,message):
     await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     time.sleep(2)
     mes = await message.reply("Reading Text . . .")
-    voices = await VoicesManager.create()
-    # user = User.get_user(botusers.get(message.from_user.id))    
+    voices = await VoicesManager.create()    
     user = Get_User(message.from_user.id)
-    # time.sleep(3)    
+    time.sleep(3)    
     if user :
         await bot.edit_message_text(message.chat.id,mes.id," Checking the selected voice ") 
         voice= user[4]
@@ -124,43 +121,26 @@ def Get_User(id):
     else:
         return None
 
+def Manage_User(message):
 
-def Manage_User(Chat_id,id):
-    print("temp")
-    TgUser = bot.get_users(id)
+        Cur.execute(f'select * from User where id={message.from_user.id}')
+        result = Cur.fetchall()        
+        if result:
+            for res in result:
+                print(res)
+                message.reply(f"Welcome Dear `{res[1]}`")
+        else:
+            uid = message.from_user.id
+            name = f"User{uid}"
+            sv = 'en-US-SteffanNeural'
+            msg = f"Insert into User(id, username,wordsleft,premium_status,selected_voice) values({uid},'{name}',300 ,False,'{sv}');"
+            Cur.execute(msg)
+            Conn.commit() 
+            message.reply(f"Welcome To Fine TTS Dear {name}")
 
-    try:
-         name = TgUser.first_name + ' ' +TgUser.last_name
-    except:
-         try:
-              name = TgUser.first_name
-         except:
-              name = 'User'+ str(id)    
-    if id in botusers:        
-        user = User.get_user(botusers.get(id))         
-        match = re.findall(r'-(\w+)Neural', user.selectedvoice)
-        bot.send_message(Chat_id ,f"Dear {user.username} Welcome \n words left : {user.wordsleft} \n selected voice : {match[0]}")
-    else :
-        bot.send_message(Chat_id,"Welcome")
-        botusers[id] = User(id,name)
-        print(botusers)        
-
-def MU (bot,message):
-    Cur.execute(f'select * from User where id={message.from_user.id}')
-    result = Cur.fetchall()
-    if result:
-        for res in result:
-            print(res)
-            message.reply(f"Finally Welcome again `{res[1]}`")
-    else :
-        uid = message.from_user.id
-        name = f"User{uid}"
-        sv = 'en-US-SteffanNeural'
-        msg = f"Insert into User(id, username,wordsleft,premium_status,selected_voice) values({uid},'{name}',300,False,'{sv}');"
-        Cur.execute(msg)
-        Conn.commit() 
-        message.reply(f"Welcome Dear {name}")
-    
+def ChangeVoice(voice,uid):
+    Cur.execute(f"update User set selected_voice = '{voice}' where id = {uid} ")
+    Conn.commit()
 
     
 
@@ -168,9 +148,8 @@ def MU (bot,message):
 
 @bot.on_message(filters.private & (filters.command("start") or filters.command("Start")))
 def Greetuser(bot,message):    
-    # Manage_User(message.chat.id,  message.from_user.id)
-    MU(bot,message)
-
+    Manage_User(message)
+    
 @bot.on_message(filters.private & (filters.command("lang") | filters.command("language")))
 def ChangeLanguage(bot,message):
     text = "Select your prefered language."
@@ -185,18 +164,29 @@ def GoBackMenu(bot,message):
 @bot.on_message(filters.private & filters.command("stat"))
 def Greetuser(bot,message):    
     id = message.from_user.id
-    if id in botusers:        
-        user = User.get_user(botusers.get(id))         
-        match = re.findall(r'-(\w+)Neural', user.selectedvoice)
-        message.reply(f""" User : {user.username}\n words left : {user.wordsleft} \n selected voice : {match[0]} \n premium : {user.premium_status}""")
+    try:
+        name = message.from_user.first_name
+    except:
+        name = f"User{id}"
+    user = Get_User(message.from_user.id)
+     
+    if user:
+        wl = str(user[2])        
+        match = re.findall(r'-(\w+)Neural', user[4])
+        if user[3] == 0:
+            prem = "False"
+        else:
+            prem = "True"
+            wl = "♾"
+        message.reply(f"""\n ID:  `{user[1]}` \n\n Name :  `{name}`\n\n Words left :  `{wl}` \n\n selected voice :  `{match[0]}` \n\n premium :  `{prem}`   """)
 
-@bot.on_message(filters.private & filters.regex('chgprem'))
-def PromoteDemote (bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))
-    if user.premium_status == False:
-        user.ChangePremium(True)
-    else:
-        user.ChangePremium(False)
+# @bot.on_message(filters.private & filters.regex('chgprem'))
+# def PromoteDemote (bot,message):
+#     user = Get_User(message.from_user.id)
+#     if user.premium_status == False:
+#         user.ChangePremium(True)
+#     else:
+#         user.ChangePremium(False)
                     
 # amharic
 
@@ -212,8 +202,7 @@ async def AmharicMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Ameha'))
 async def setAmeha(bot,message):
     if message.text == 'Ameha':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("am-ET-AmehaNeural")
+        ChangeVoice("am-ET-AmehaNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -221,8 +210,7 @@ async def setAmeha(bot,message):
 @bot.on_message(filters.private & filters.regex('Mekdes'))
 async def setMekdes(bot,message):    
     if message.text == 'Mekdes':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("am-ET-MekdesNeural")
+        ChangeVoice("am-ET-MekdesNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -241,8 +229,7 @@ async def RussianMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Dmitry'))
 async def setDmitry(bot,message):
     if message.text == 'Dmitry':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("ru-RU-DmitryNeural")
+        ChangeVoice("ru-RU-DmitryNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -250,8 +237,7 @@ async def setDmitry(bot,message):
 @bot.on_message(filters.private & filters.regex('Svetlana'))
 async def setSvetlana(bot,message):
     if message.text == 'Svetlana':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("ru-RU-SvetlanaNeural")
+        ChangeVoice("ru-RU-SvetlanaNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -270,8 +256,7 @@ async def FrenchMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Henri'))
 async def setHenri(bot,message):
     if message.text == 'Henri':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("fr-FR-HenriNeural")
+        ChangeVoice("fr-FR-HenriNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -279,8 +264,7 @@ async def setHenri(bot,message):
 @bot.on_message(filters.private & filters.regex('Denise'))
 async def setDenise(bot,message):
     if message.text == 'Denise':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("fr-FR-DeniseNeural")
+        ChangeVoice("fr-FR-DeniseNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -299,8 +283,7 @@ async def SpanishMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Alvaro'))
 async def setAlvaro(bot,message):
     if message.text == 'Alvaro':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("es-ES-AlvaroNeural")
+        ChangeVoice("es-ES-AlvaroNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -308,8 +291,7 @@ async def setAlvaro(bot,message):
 @bot.on_message(filters.private & filters.regex('Elvira'))
 async def setElvira(bot,message):
     if message.text == 'Elvira':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("es-ES-ElviraNeural")
+        ChangeVoice("es-ES-ElviraNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")
     else:
         await TTS(bot,message)
@@ -328,8 +310,7 @@ async def EnglishMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Steffan'))
 async def setSteffan(bot,message):
     if message.text == 'Steffan':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("en-US-SteffanNeural")
+        ChangeVoice("en-US-SteffanNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -337,8 +318,7 @@ async def setSteffan(bot,message):
 @bot.on_message(filters.private & filters.regex('Jenny'))
 async def setJenny(bot,message):
     if message.text == 'Jenny':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("en-US-JennyNeural")
+        ChangeVoice("en-US-JennyNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -357,8 +337,7 @@ async def MandarinMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Yunjian'))
 async def setYunjian(bot,message):
     if message.text == 'Yunjian':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("zh-CN-YunjianNeural")
+        ChangeVoice("zh-CN-YunjianNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -366,8 +345,7 @@ async def setYunjian(bot,message):
 @bot.on_message(filters.private & filters.regex('Xiaoxiao'))
 async def setXiaoxiao(bot,message):
     if message.text == 'Xiaoxiao':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("zh-CN-XiaoxiaoNeural")
+        ChangeVoice("zh-CN-XiaoxiaoNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -386,8 +364,7 @@ async def ArabicMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Hamdan'))
 async def setHamdan(bot,message):
     if message.text == 'Hamdan':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("ar-Ae-HamdanNeural")
+        ChangeVoice("ar-Ae-HamdanNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -395,8 +372,7 @@ async def setHamdan(bot,message):
 @bot.on_message(filters.private & filters.regex('Fatima'))
 async def setFatima(bot,message):
     if message.text == 'Fatima':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("ar-Ae-FatimaNeural")
+        ChangeVoice("ar-Ae-FatimaNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -415,8 +391,7 @@ async def GermanMenu(bot,message):
 @bot.on_message(filters.private & filters.regex('Conrad'))
 async def setConrad(bot,message):
     if message.text == 'Conrad':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("de-DE-ConradNeural")
+        ChangeVoice("de-DE-ConradNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -424,8 +399,7 @@ async def setConrad(bot,message):
 @bot.on_message(filters.private & filters.regex('Amala'))
 async def setAmala(bot,message):
     if message.text == 'Amala':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("de-DE-AmalaNeural")
+        ChangeVoice("de-DE-AmalaNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -443,8 +417,7 @@ async def MoreLang(bot,message):
 @bot.on_message(filters.private & filters.regex('Ana'))
 async def setAna(bot,message):
     if message.text == 'Ana(Eng Child)':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("en-US-AnaNeural")
+        ChangeVoice("en-US-AnaNeural",message.from_user.id)
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -452,8 +425,7 @@ async def setAna(bot,message):
 @bot.on_message(filters.private & filters.regex('Neerja'))
 async def setNeerja(bot,message):
     if message.text == 'Neerja(Eng Indian)':
-        user = User.get_user(botusers.get(message.from_user.id))         
-        user.ChangeVoice("en-IN-NeerjaNeural")
+        ChangeVoice("en-IN-NeerjaNeural")
         await message.reply("Language Succesfully changed")    
     else:
         await TTS(bot,message)
@@ -463,12 +435,14 @@ async def setNeerja(bot,message):
         
 @bot.on_message(filters.private & filters.text)
 async def TextToSpeech(bot,message):
-    user = User.get_user(botusers.get(message.from_user.id))
     user = Get_User(message.from_user.id)
-    if user[2] > len(message.text.split()): 
-        await TTS(bot,message)
-    else :
-        await message.reply("I'm sorry you don't have enough words left for today , Try again tomorrow")
+    if user:
+        if user[2] > len(message.text.split()): 
+            await TTS(bot,message)
+        else :
+            await message.reply("I'm sorry you don't have enough words left for today , Try again tomorrow")
+    else:
+        await message.reply()
 
 
 
