@@ -180,13 +180,13 @@ def Greetuser(bot,message):
             wl = "♾"
         message.reply(f"""\n ID:  `{user[1]}` \n\n Name :  `{name}`\n\n Words left :  `{wl}` \n\n selected voice :  `{match[0]}` \n\n premium :  `{prem}`   """)
 
-# @bot.on_message(filters.private & filters.regex('chgprem'))
-# def PromoteDemote (bot,message):
-#     user = Get_User(message.from_user.id)
-#     if user.premium_status == False:
-#         user.ChangePremium(True)
-#     else:
-#         user.ChangePremium(False)
+@bot.on_message(filters.private & filters.regex('chgprem'))
+def PromoteDemote (bot,message):
+    user = Get_User(message.from_user.id)
+    if user.premium_status == False:
+        user.ChangePremium(True)
+    else:
+        user.ChangePremium(False)
                     
 # amharic
 
