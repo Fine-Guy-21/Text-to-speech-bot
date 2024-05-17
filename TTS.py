@@ -183,7 +183,7 @@ def Greetuser(bot,message):
 @bot.on_message(filters.private & filters.regex('chgprem'))
 def PromoteDemote (bot,message):
     user = Get_User(message.from_user.id)
-    if user.premium_status == False:
+    if user[3] == False:
         user.ChangePremium(True)
     else:
         user.ChangePremium(False)
