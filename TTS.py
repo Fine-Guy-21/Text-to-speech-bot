@@ -1,7 +1,7 @@
 from pyrogram import Client, filters , enums
 from pyrogram.types import ReplyKeyboardMarkup 
 from edge_tts import VoicesManager
-import time , re , edge_tts , mysql.connector
+import time , re , edge_tts , mysql.connector , openpyxl
 
 
 bot = Client("TTS Bot",api_id=21832338, 
