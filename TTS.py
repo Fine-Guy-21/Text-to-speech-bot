@@ -19,7 +19,7 @@ Conn = mysql.connector.connect(
     database='TTSBotDB'
 )
 
-db = openpyxl.load_workbook()
+db = openpyxl.load_workbook("TTS_Database")
 
 
 print(Conn)
