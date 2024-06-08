@@ -18,6 +18,10 @@ Conn = mysql.connector.connect(
     password='cityzens',
     database='TTSBotDB'
 )
+
+db = openpyxl.load_workbook()
+
+
 print(Conn)
 Cur = Conn.cursor()
 
